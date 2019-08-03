@@ -29,51 +29,51 @@ public class XmlStreamServer {
     private EntryMarshaller entryMarshaller = new EntryMarshaller();
     private int port;
 
-    private XmlStreamServer(int port) throws IOException {
+    public XmlStreamServer(int port) {
         this.port = port;
+    }
+
+    public void startServer() {
         LOG.info("Starting server localhost:{}", port);
-        ServerSocket serverSocket = new ServerSocket(port);
-        while (shouldRun.get()) {
-            try (Socket socket = serverSocket.accept()) {
-                final OutputStream outputStream = socket.getOutputStream();
-                //Keep test server simple, serve only one client at the time
-                while (shouldRun.get()) {
-                    try {
-                        Random random = new Random();
-                        TimeUnit.MILLISECONDS.sleep(random.nextInt(100) + 100);
-                        EntryDto entryDto = new EntryDto(random.nextInt(100) - 50 + "." + random.nextInt(100), System.currentTimeMillis());
-                        outputStream.write((entryMarshaller.marshallToXml(entryDto) + "\n").getBytes());
-                    } catch (IOException e) {
-                        if (e instanceof SocketException) {
-                            LOG.warn("Client stopped receiving");
-                            break;
-                        } else {
-                            LOG.error("Error writing to output stream", e);
+        shouldRun.set(true);
+        try {
+            ServerSocket serverSocket = new ServerSocket(port);
+            while (shouldRun.get()) {
+                try (Socket socket = serverSocket.accept()) {
+                    final OutputStream outputStream = socket.getOutputStream();
+                    //Keep test server simple, serve only one client at the time
+                    while (shouldRun.get()) {
+                        try {
+                            Random random = new Random();
+                            TimeUnit.MILLISECONDS.sleep(random.nextInt(100) + 100);
+                            EntryDto entryDto = new EntryDto(random.nextInt(100) - 50 + "." + random.nextInt(100), System.currentTimeMillis());
+                            outputStream.write((entryMarshaller.marshallToXml(entryDto) + "\n").getBytes());
+                        } catch (IOException e) {
+                            if (e instanceof SocketException) {
+                                LOG.warn("Client stopped receiving");
+                                break;
+                            } else {
+                                LOG.error("Error writing to output stream", e);
+                            }
+                        } catch (InterruptedException e) {
+                            throw new LoggingRuntimeException("Error when slowing down server", e);
                         }
-                    } catch (InterruptedException e) {
-                        throw new LoggingRuntimeException("Error when slowing down server", e);
                     }
                 }
             }
+        } catch (IOException e) {
+            throw new LoggingRuntimeException("Can't start server", e);
         }
     }
 
-    //TODO: Extract start server to standalone method
     public void stopServer() {
         LOG.info("Stopping server {}", getPort());
         this.shouldRun.set(false);
     }
 
     public static void main(String[] args) throws IOException {
-        new XmlStreamServer(9696);
-    }
-
-    public static XmlStreamServer startServer(int port) {
-        try {
-            return new XmlStreamServer(port);
-        } catch (IOException e) {
-            throw new LoggingRuntimeException("Can't start server", e);
-        }
+        final XmlStreamServer xmlStreamServer = new XmlStreamServer(9696);
+        xmlStreamServer.startServer();
     }
 
     public int getPort() {

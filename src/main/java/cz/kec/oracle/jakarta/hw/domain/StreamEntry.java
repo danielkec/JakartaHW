@@ -1,6 +1,8 @@
-package cz.kec.oracle.jakarta.hw;
+package cz.kec.oracle.jakarta.hw.domain;
 
 import java.util.stream.Stream;
+
+import cz.kec.oracle.jakarta.hw.StreamReader;
 
 /**
  * StreamEntry

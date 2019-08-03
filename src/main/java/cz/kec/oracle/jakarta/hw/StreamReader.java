@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import cz.kec.oracle.jakarta.hw.domain.StreamEntry;
 import cz.kec.oracle.jakarta.hw.dto.EntryDto;
 import cz.kec.oracle.jakarta.hw.util.DtoMapper;
 import cz.kec.oracle.jakarta.hw.util.EntryMarshaller;

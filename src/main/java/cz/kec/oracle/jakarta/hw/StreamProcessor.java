@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 
+import cz.kec.oracle.jakarta.hw.domain.StreamEntry;
 import cz.kec.oracle.jakarta.hw.util.CombinerUrlStreamHandler;
 import cz.kec.oracle.jakarta.hw.util.DtoMapper;
 import cz.kec.oracle.jakarta.hw.util.LoggingRuntimeException;

@@ -21,12 +21,11 @@ public class Demo {
     public static void main(String[] args) throws InterruptedException {
 
         final List<Integer> defaultServersPorts = Arrays.asList(9696, 9697, 9698, 9699, 9700, 9701, 9702);
+        final List<XmlStreamServer> servers = defaultServersPorts.stream().map(XmlStreamServer::new).collect(Collectors.toList());
 
         final ExecutorService executorService = Executors.newFixedThreadPool(defaultServersPorts.size() + 1);
 
-        defaultServersPorts.forEach(p -> executorService.submit(() -> {
-            XmlStreamServer.startServer(p);
-        }));
+        servers.forEach(s -> executorService.submit(s::startServer));
 
         Set<String> urls = defaultServersPorts.stream().map(s -> String.format("jsc://localhost:%s", s)).collect(Collectors.toSet());
         StreamProcessor streamProcessor = new StreamProcessor(urls, System.out);
@@ -34,8 +33,9 @@ public class Demo {
         executorService.submit(streamProcessor::process);
 
         //10 seconds demo
-        executorService.awaitTermination(10, TimeUnit.SECONDS);
-        executorService.shutdownNow();
+        TimeUnit.SECONDS.sleep(10);
+        servers.forEach(XmlStreamServer::stopServer);
+        executorService.shutdown();
     }
 
 }

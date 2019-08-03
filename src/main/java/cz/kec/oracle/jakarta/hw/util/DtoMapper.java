@@ -1,6 +1,6 @@
 package cz.kec.oracle.jakarta.hw.util;
 
-import cz.kec.oracle.jakarta.hw.StreamEntry;
+import cz.kec.oracle.jakarta.hw.domain.StreamEntry;
 import cz.kec.oracle.jakarta.hw.dto.EntryDto;
 
 /**
