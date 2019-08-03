@@ -15,6 +15,7 @@ import javax.json.bind.JsonbBuilder;
 
 import cz.kec.oracle.jakarta.hw.util.CombinerUrlStreamHandler;
 import cz.kec.oracle.jakarta.hw.util.DtoMapper;
+import cz.kec.oracle.jakarta.hw.util.LoggingRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,7 @@ public class StreamProcessor {
         try {
             resultStream.write(line.getBytes(Charset.forName("UTF-8")));
         } catch (IOException e) {
-            throw  new RuntimeException("Error when writing to output stream" ,e);
+            throw  new LoggingRuntimeException("Error when writing to output stream" ,e);
         }
     }
 

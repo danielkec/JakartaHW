@@ -6,11 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import cz.kec.oracle.jakarta.hw.dto.EntryDto;
+import cz.kec.oracle.jakarta.hw.util.DtoMapper;
 import cz.kec.oracle.jakarta.hw.util.EntryMarshaller;
+import cz.kec.oracle.jakarta.hw.util.LoggingRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class StreamReader extends BufferedReader {
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
-            throw new RuntimeException(String.format("Malformed URL: %s", urlString), e);
+            throw new LoggingRuntimeException(String.format("Malformed URL: %s", urlString), e);
         }
 
         InputStream inputStream = null;
@@ -64,15 +64,18 @@ public class StreamReader extends BufferedReader {
         try {
             line = super.readLine();
         } catch (IOException e) {
-            throw new RuntimeException("Error when reading from input stream", e);
+            throw new LoggingRuntimeException("Error when reading from input stream", e);
         }
 
         if (line == null) {
             return null;
         }
 
-        final EntryDto entryDto = entryMarshaller.unmarshall(line);
-        return new StreamEntry(url, entryDto.getData().getAmount(), entryDto.getData().getTimeStamp(), this);
+        final EntryDto entryDto = entryMarshaller.unmarshallXml(line);
+        final StreamEntry streamEntry = DtoMapper.convert(entryDto);
+        streamEntry.setUrl(url);
+        streamEntry.setParentReaders(this);
+        return streamEntry;
     }
 
     public StreamEntry lazyRead() {
@@ -85,15 +88,6 @@ public class StreamReader extends BufferedReader {
 
     public void resetLastEntry() {
         lastEntry = null;
-    }
-
-    public String getFirstGroup(String regex, String input) {
-        Matcher m = Pattern.compile(regex).matcher(input);
-        if (m.find()) {
-            return m.group(1);
-        } else {
-            return null;
-        }
     }
 
     @Override

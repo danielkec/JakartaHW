@@ -10,10 +10,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author kec
  * @since 2.8.19
  */
+@XmlRootElement
 public class EntryDto {
 
     public EntryDto() {
         data = new Data();
+    }
+
+    public EntryDto(String amount, Long timeStamp) {
+        data = new Data();
+        data.setAmount(amount);
+        data.setTimeStamp(timeStamp);
     }
 
     public EntryDto(Data data) {
@@ -34,17 +41,17 @@ public class EntryDto {
     @JsonbPropertyOrder(PropertyOrderStrategy.REVERSE)
     public static class Data {
 
-        private Float amount;
+        private String amount;
         private Long timeStamp;
 
         public Data() {
         }
 
-        public Float getAmount() {
+        public String getAmount() {
             return amount;
         }
 
-        public void setAmount(final Float amount) {
+        public void setAmount(final String amount) {
             this.amount = amount;
         }
 

@@ -13,8 +13,12 @@ public class DtoMapper {
 
     public static EntryDto convert(StreamEntry streamEntry) {
         EntryDto entryDto = new EntryDto();
-        entryDto.getData().setAmount(streamEntry.getAmount());
+        entryDto.getData().setAmount(streamEntry.getAmount().toString());
         entryDto.getData().setTimeStamp(streamEntry.getTimeStamp());
         return entryDto;
+    }
+
+    public static StreamEntry convert(EntryDto entryDto) {
+        return new StreamEntry(null, Float.parseFloat(entryDto.getData().getAmount()), entryDto.getData().getTimeStamp(), null);
     }
 }

@@ -9,6 +9,9 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import cz.kec.oracle.jakarta.hw.dto.EntryDto;
+import cz.kec.oracle.jakarta.hw.util.EntryMarshaller;
+import cz.kec.oracle.jakarta.hw.util.LoggingRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +26,7 @@ public class XmlStreamServer {
     private static Logger LOG = LoggerFactory.getLogger(XmlStreamServer.class);
 
     private AtomicBoolean shouldRun = new AtomicBoolean(true);
+    private EntryMarshaller entryMarshaller = new EntryMarshaller();
     private int port;
 
     private XmlStreamServer(int port) throws IOException {
@@ -37,8 +41,8 @@ public class XmlStreamServer {
                     try {
                         Random random = new Random();
                         TimeUnit.MILLISECONDS.sleep(random.nextInt(100) + 100);
-                        outputStream.write(String.format("<data> <timeStamp>%d</timeStamp> <amount>%s.%s</amount> </data>\n", System.currentTimeMillis(),
-                                random.nextInt(100) - 50, random.nextInt(100)).getBytes());
+                        EntryDto entryDto = new EntryDto(random.nextInt(100) - 50 + "." + random.nextInt(100), System.currentTimeMillis());
+                        outputStream.write((entryMarshaller.marshallToXml(entryDto) + "\n").getBytes());
                     } catch (IOException e) {
                         if (e instanceof SocketException) {
                             LOG.warn("Client stopped receiving");
@@ -47,7 +51,7 @@ public class XmlStreamServer {
                             LOG.error("Error writing to output stream", e);
                         }
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        throw new LoggingRuntimeException("Error when slowing down server", e);
                     }
                 }
             }
@@ -55,7 +59,7 @@ public class XmlStreamServer {
     }
 
     //TODO: Extract start server to standalone method
-    public void  stopServer() {
+    public void stopServer() {
         LOG.info("Stopping server {}", getPort());
         this.shouldRun.set(false);
     }
@@ -68,7 +72,7 @@ public class XmlStreamServer {
         try {
             return new XmlStreamServer(port);
         } catch (IOException e) {
-            throw new RuntimeException("Can't start server", e);
+            throw new LoggingRuntimeException("Can't start server", e);
         }
     }
 

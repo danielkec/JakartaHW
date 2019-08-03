@@ -50,6 +50,10 @@ public class StreamEntry {
         return parentReaders;
     }
 
+    public void setParentReaders(final StreamReader... parentReaders) {
+        this.parentReaders = parentReaders;
+    }
+
     public StreamEntry mergeAmount(StreamEntry entry) {
         return new StreamEntry(this.url, this.amount + entry.amount, this.timeStamp,
                 Stream.of(this.parentReaders, entry.parentReaders).flatMap(Stream::of).toArray(StreamReader[]::new));
