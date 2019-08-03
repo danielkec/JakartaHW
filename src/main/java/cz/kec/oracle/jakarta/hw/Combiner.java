@@ -5,16 +5,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Combainer
+ * Combiner
  *
  * @author kec
  * @since 2.8.19
  */
-public class Combainer {
+public class Combiner {
 
     public static void main(String[] args) {
-        if(args.length == 0){
-            System.out.println("Missing arguments, example: java Combainer jsc://localhost:9696 file:/home/kec/Stream3.txt");
+        if (args.length == 0) {
+            System.out.println("Missing arguments, example: java Combiner jsc://localhost:9696 file:/home/kec/Stream3.txt");
             System.exit(0);
         }
         Set<String> urls = Arrays.stream(args).collect(Collectors.toSet());

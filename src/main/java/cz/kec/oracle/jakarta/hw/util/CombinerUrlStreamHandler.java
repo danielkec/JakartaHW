@@ -21,12 +21,12 @@ public class CombinerUrlStreamHandler extends URLStreamHandler {
     private Logger LOG = LoggerFactory.getLogger(CombinerUrlStreamHandler.class);
 
     @Override
-    protected URLConnection openConnection(final URL u) throws IOException {
+    protected URLConnection openConnection(final URL u) {
         return new URLConnection(u) {
 
             @Override
-            public void connect() throws IOException {
-                LOG.info("Connected with {} custom Jakarta stream protocol", url.toString());
+            public void connect() {
+                LOG.info("Connected with {} custom Jakarta stream combiner protocol", url.toString());
             }
 
             @Override

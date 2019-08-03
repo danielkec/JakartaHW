@@ -10,12 +10,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-
 import cz.kec.oracle.jakarta.hw.domain.StreamEntry;
 import cz.kec.oracle.jakarta.hw.util.CombinerUrlStreamHandler;
 import cz.kec.oracle.jakarta.hw.util.DtoMapper;
+import cz.kec.oracle.jakarta.hw.util.EntryMarshaller;
 import cz.kec.oracle.jakarta.hw.util.LoggingRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,17 +40,16 @@ public class StreamProcessor {
 
     private Logger LOG = LoggerFactory.getLogger(StreamProcessor.class);
 
-    private final Jsonb jsonb;
+    private final EntryMarshaller marshaller = new EntryMarshaller();
     private Set<String> streamUrls;
     private OutputStream resultStream;
 
     public StreamProcessor(final Set<String> streamUrls, final OutputStream resultStream) {
         this.streamUrls = streamUrls;
         this.resultStream = resultStream;
-        this.jsonb = JsonbBuilder.create();
     }
 
-    public void process(){
+    public void process() {
         Map<String, StreamReader> readerMap = streamUrls.stream()
                 .map(StreamReader::newInstance)
                 .filter(Objects::nonNull)
@@ -72,21 +69,21 @@ public class StreamProcessor {
                 continue;
             }
 
-            printlnToStream(jsonb.toJson(DtoMapper.convert(oldestEntry)));
+            printlnToStream(marshaller.marshallToJson(DtoMapper.convert(oldestEntry)));
             Stream.of(oldestEntry.getParentReaders()).forEach(StreamReader::resetLastEntry);
         } while (oldestEntry != null);
     }
 
-    private void printlnToStream(String line){
+    private void printlnToStream(String line) {
         line = line + '\n';
         try {
             resultStream.write(line.getBytes(Charset.forName("UTF-8")));
         } catch (IOException e) {
-            throw  new LoggingRuntimeException("Error when writing to output stream" ,e);
+            throw new LoggingRuntimeException("Error when writing to output stream", e);
         }
     }
 
-    private StreamEntry getOldestEntry(Map<String, StreamReader> readerMap){
+    private StreamEntry getOldestEntry(Map<String, StreamReader> readerMap) {
         StreamEntry oldestEntry = null;
         for (StreamReader reader : readerMap.values()) {
             final StreamEntry entry = reader.lazyRead();

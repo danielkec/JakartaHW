@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.Charset;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,7 +48,7 @@ public class XmlStreamServer {
                             Random random = new Random();
                             TimeUnit.MILLISECONDS.sleep(random.nextInt(100) + 100);
                             EntryDto entryDto = new EntryDto(random.nextInt(100) - 50 + "." + random.nextInt(100), System.currentTimeMillis());
-                            outputStream.write((entryMarshaller.marshallToXml(entryDto) + "\n").getBytes());
+                            outputStream.write((entryMarshaller.marshallToXml(entryDto) + "\n").getBytes(Charset.forName("UTF-8")));
                         } catch (IOException e) {
                             if (e instanceof SocketException) {
                                 LOG.warn("Client stopped receiving");
