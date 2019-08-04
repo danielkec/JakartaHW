@@ -9,7 +9,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * 10 seconds demo version starting 6 Xml stream sources and 1 Combiner to merge them to 1 Json stream.
+ * Simple standalone demo which is starting 6 servers on 6 different ports(9696, 9697, 9698, 9699, 9700, 9701, 9702)
+ * and 1 Combiner listening to them all. Demo stops after 10 seconds all servers,
+ * Combiner shuts down by itself when there is nothing to process.
  *
  * @see <a href="https://gist.github.com/m0mus/ba6c5419278239a19175445787420736">Homework assigment</a>
  *

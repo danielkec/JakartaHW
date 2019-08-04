@@ -96,4 +96,4 @@
 <data> <timeStamp>1564672966879</timeStamp> <amount>96.96</amount> </data>
 <data> <timeStamp>1564672966880</timeStamp> <amount>97.97</amount> </data>
 <data> <timeStamp>1564672966882</timeStamp> <amount>98.98</amount> </data>
-<data> <timeStamp>1564672967131</timeStamp> <amount>100.9999</amount> </data>
+<!-- Test entry merge --><data> <timeStamp>1564672967131</timeStamp> <amount>100.00</amount> </data>

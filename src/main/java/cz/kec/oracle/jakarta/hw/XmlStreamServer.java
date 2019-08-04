@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 /**
  * XmlStreamServer
  *
+ * Xml stream server producing continuous never ending stream of xml fragments in random intervals 100 - 500 ms.
+ *
  * @author kec
  * @since 2.8.19
  */
@@ -46,9 +48,13 @@ public class XmlStreamServer {
                     while (shouldRun.get()) {
                         try {
                             Random random = new Random();
-                            TimeUnit.MILLISECONDS.sleep(random.nextInt(100) + 100);
+                            TimeUnit.MILLISECONDS.sleep(random.nextInt(400) + 100);
                             EntryDto entryDto = new EntryDto(random.nextInt(100) - 50 + "." + random.nextInt(100), System.currentTimeMillis());
-                            outputStream.write((entryMarshaller.marshallToXml(entryDto) + "\n").getBytes(Charset.forName("UTF-8")));
+                            final String xmlFragment = entryMarshaller.marshallToXml(entryDto);
+                            if(LOG.isDebugEnabled()){
+                                LOG.debug(xmlFragment);
+                            }
+                            outputStream.write((xmlFragment + "\n").getBytes(Charset.forName("UTF-8")));
                         } catch (IOException e) {
                             if (e instanceof SocketException) {
                                 LOG.warn("Client stopped receiving");
@@ -72,8 +78,15 @@ public class XmlStreamServer {
         this.shouldRun.set(false);
     }
 
-    public static void main(String[] args) throws IOException {
-        final XmlStreamServer xmlStreamServer = new XmlStreamServer(9696);
+    public static void main(String[] args) {
+        int port = 9696;
+        if (args.length > 1 || (args.length == 1 && !args[0].matches("\\d{1,5}"))) {
+            throw new RuntimeException("Only one argument allowed with custom port number.");
+        }
+        if (args.length == 1) {
+            port = Integer.parseInt(args[0]);
+        }
+        final XmlStreamServer xmlStreamServer = new XmlStreamServer(port);
         xmlStreamServer.startServer();
     }
 

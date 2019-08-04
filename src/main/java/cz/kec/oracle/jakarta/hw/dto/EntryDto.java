@@ -3,6 +3,7 @@ package cz.kec.oracle.jakarta.hw.dto;
 import javax.json.bind.annotation.JsonbPropertyOrder;
 import javax.json.bind.config.PropertyOrderStrategy;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * EntryDto
@@ -38,6 +39,7 @@ public class EntryDto {
     private EntryDto.Data data;
 
     @XmlRootElement(name = "data")
+    @XmlType(propOrder = { "timeStamp", "amount" })
     @JsonbPropertyOrder(PropertyOrderStrategy.REVERSE)
     public static class Data {
 

@@ -33,6 +33,7 @@ public class EntryMarshaller {
             JAXBContext jaxbContext = JAXBContext.newInstance(EntryDto.Data.class, EntryDto.class);
             this.jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             this.jaxbMarshaller = jaxbContext.createMarshaller();
+            this.jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
         } catch (JAXBException e) {
             throw new LoggingRuntimeException("Error when preparing marshallers", e);
@@ -53,6 +54,10 @@ public class EntryMarshaller {
         return jsonb.toJson(entryDto);
     }
 
+    public EntryDto unmarshallFromJson(final String json) {
+        return jsonb.fromJson(json, EntryDto.class);
+    }
+
     public String marshallToXml(EntryDto entryDto) {
         StringWriter stringWriter = new StringWriter();
         try {
@@ -62,5 +67,4 @@ public class EntryMarshaller {
             throw new LoggingRuntimeException("Error marshalling entry data", e);
         }
     }
-
 }
