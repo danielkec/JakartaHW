@@ -34,7 +34,7 @@ Demo stops after 10 seconds all servers, Combiner shuts down by itself when ther
  
 #### Bonus points - TODO
  * [ ] add solution in case if some input streams hang.
- * [ ] imagine that timestamps comparing operation is VERY expensive - try to minimize it's usage.
+ * [x] imagine that timestamps comparing operation is VERY expensive - try to minimize it's usage. -> Min heap instead of direct k-way merge see [812dbaa](https://github.com/danielkec/JakartaHW/commit/812dbaaf66ffdb14e63faafeb9f906a6dfba681f)
  
 ### Non-functional requirements fulfilment
  * [x] You must use Maven 3.x to build the project.
