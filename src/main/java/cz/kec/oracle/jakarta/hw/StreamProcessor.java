@@ -4,17 +4,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import cz.kec.oracle.jakarta.hw.domain.StreamEntry;
+import cz.kec.oracle.jakarta.hw.util.CombinerRuntimeException;
 import cz.kec.oracle.jakarta.hw.util.CombinerUrlStreamHandler;
 import cz.kec.oracle.jakarta.hw.util.DtoMapper;
 import cz.kec.oracle.jakarta.hw.util.EntryMarshaller;
-import cz.kec.oracle.jakarta.hw.util.CombinerRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +43,7 @@ public class StreamProcessor {
     private final EntryMarshaller marshaller = new EntryMarshaller();
     private Set<String> streamUrls;
     private OutputStream resultStream;
+    private MergingMinHeap minHeap;
 
     public StreamProcessor(final Set<String> streamUrls, final OutputStream resultStream) {
         this.streamUrls = streamUrls;
@@ -50,6 +51,8 @@ public class StreamProcessor {
     }
 
     public void process() {
+        this.minHeap = new MergingMinHeap();
+
         List<StreamReader> readerMap = streamUrls.stream()
                 .map(StreamReader::newInstance)
                 .filter(Objects::nonNull)
@@ -60,18 +63,28 @@ public class StreamProcessor {
             System.exit(1);
         }
 
-        StreamEntry oldestEntry = null;
-        do {
-            oldestEntry = getOldestEntry(readerMap);
+        readerMap.forEach(r -> minHeap.add(r.readNextEntry()));
 
-            //All streams empty, waiting for more data
+        StreamEntry oldestEntry;
+        do {
+            oldestEntry = minHeap.pollAndMerge();
+
+            //No more data in the streams
             if (oldestEntry == null) {
-                continue;
+                break;
             }
 
+            Arrays.stream(oldestEntry.getParentReaders()).forEach(this::addNextEntryToHeap);
+
             printlnToStream(marshaller.marshallToJson(DtoMapper.convert(oldestEntry)));
-            Stream.of(oldestEntry.getParentReaders()).forEach(StreamReader::resetLastEntry);
-        } while (oldestEntry != null);
+        } while (true);
+    }
+
+    private void addNextEntryToHeap(StreamReader reader) {
+        final StreamEntry nextEntry = reader.readNextEntry();
+        if (nextEntry != null) {
+            minHeap.add(nextEntry);
+        }
     }
 
     private void printlnToStream(String line) {
@@ -83,29 +96,4 @@ public class StreamProcessor {
         }
     }
 
-    private StreamEntry getOldestEntry(List<StreamReader> readerMap) {
-        StreamEntry oldestEntry = null;
-        for (StreamReader reader : readerMap) {
-            final StreamEntry entry = reader.lazyRead();
-            if (oldestEntry == null) {
-                oldestEntry = entry;
-                continue;
-            }
-
-            //nothing in the input stream right now
-            if (entry == null) {
-                continue;
-            }
-
-            switch (entry.compareToEntry(oldestEntry)) {
-                case -1:
-                    oldestEntry = entry;
-                    break;
-                case 0:
-                    oldestEntry = oldestEntry.mergeAmount(entry);
-                    break;
-            }
-        }
-        return oldestEntry;
-    }
 }

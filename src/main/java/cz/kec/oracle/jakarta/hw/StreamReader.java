@@ -24,13 +24,8 @@ import org.slf4j.LoggerFactory;
 public class StreamReader extends BufferedReader {
 
     private static Logger LOG = LoggerFactory.getLogger(StreamReader.class);
-    private StreamEntry lastEntry;
+
     private EntryMarshaller entryMarshaller = new EntryMarshaller();
-
-    public String getUrl() {
-        return url;
-    }
-
     private final String url;
     private InputStream inputStream;
 
@@ -77,18 +72,6 @@ public class StreamReader extends BufferedReader {
         streamEntry.setUrl(url);
         streamEntry.setParentReaders(this);
         return streamEntry;
-    }
-
-    public StreamEntry lazyRead() {
-        if (lastEntry != null) {
-            return lastEntry;
-        }
-        lastEntry = readNextEntry();
-        return lastEntry;
-    }
-
-    public void resetLastEntry() {
-        lastEntry = null;
     }
 
     @Override

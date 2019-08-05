@@ -10,7 +10,7 @@ import cz.kec.oracle.jakarta.hw.StreamReader;
  * @author kec
  * @since 2.8.19
  */
-public class StreamEntry {
+public class StreamEntry implements Comparable<StreamEntry> {
     private String url;
     private Float amount;
     private Long timeStamp;
@@ -24,10 +24,6 @@ public class StreamEntry {
         this.parentReaders = parentReaders;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
     public void setUrl(final String url) {
         this.url = url;
     }
@@ -36,16 +32,8 @@ public class StreamEntry {
         return amount;
     }
 
-    public void setAmount(final Float amount) {
-        this.amount = amount;
-    }
-
     public Long getTimeStamp() {
         return timeStamp;
-    }
-
-    public void setTimeStamp(final Long timeStamp) {
-        this.timeStamp = timeStamp;
     }
 
     public StreamReader[] getParentReaders() {
@@ -61,21 +49,8 @@ public class StreamEntry {
                 Stream.of(this.parentReaders, entry.parentReaders).flatMap(Stream::of).toArray(StreamReader[]::new));
     }
 
-    /**
-     * Compare timestamps
-     *
-     * @param streamEntry
-     * @return 0 - equal, -1 if this is older than arg, and +1 if this is younger than arg
-     */
-    public int compareToEntry(StreamEntry streamEntry) {
-        if (streamEntry == null){
-            return +1;
-        }
-        return this.timeStamp.compareTo(streamEntry.timeStamp);
-    }
-
-    public String toJson() {
-        //{ "data": { "timestamp":123456789, "amount":"1234.567890" }}
-        return String.format("{ \"data\": { \"timestamp\":%s, \"amount\":\"%s\" }}", this.getTimeStamp(), this.getAmount());
+    @Override
+    public int compareTo(final StreamEntry o) {
+        return this.getTimeStamp().compareTo(o.getTimeStamp());
     }
 }
