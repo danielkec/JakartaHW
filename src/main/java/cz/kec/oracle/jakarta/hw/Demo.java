@@ -27,12 +27,12 @@ public class Demo {
 
         final ExecutorService executorService = Executors.newFixedThreadPool(defaultServersPorts.size() + 1);
 
-        servers.forEach(s -> executorService.submit(s::startServer));
+        servers.forEach(s -> executorService.execute(s::startServer));
 
         Set<String> urls = defaultServersPorts.stream().map(s -> String.format("jsc://localhost:%s", s)).collect(Collectors.toSet());
         StreamProcessor streamProcessor = new StreamProcessor(urls, System.out);
 
-        executorService.submit(streamProcessor::process);
+        executorService.execute(streamProcessor::process);
 
         //10 seconds demo
         TimeUnit.SECONDS.sleep(10);

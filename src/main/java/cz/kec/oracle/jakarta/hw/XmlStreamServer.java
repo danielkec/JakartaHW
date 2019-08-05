@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cz.kec.oracle.jakarta.hw.dto.EntryDto;
+import cz.kec.oracle.jakarta.hw.util.CombinerRuntimeException;
 import cz.kec.oracle.jakarta.hw.util.EntryMarshaller;
-import cz.kec.oracle.jakarta.hw.util.LoggingRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class XmlStreamServer {
                             TimeUnit.MILLISECONDS.sleep(random.nextInt(400) + 100);
                             EntryDto entryDto = new EntryDto(random.nextInt(100) - 50 + "." + random.nextInt(100), System.currentTimeMillis());
                             final String xmlFragment = entryMarshaller.marshallToXml(entryDto);
-                            if(LOG.isDebugEnabled()){
+                            if (LOG.isDebugEnabled()) {
                                 LOG.debug(xmlFragment);
                             }
                             outputStream.write((xmlFragment + "\n").getBytes(Charset.forName("UTF-8")));
@@ -63,13 +63,13 @@ public class XmlStreamServer {
                                 LOG.error("Error writing to output stream", e);
                             }
                         } catch (InterruptedException e) {
-                            throw new LoggingRuntimeException("Error when slowing down server", e);
+                            throw new CombinerRuntimeException("Error when slowing down server", e);
                         }
                     }
                 }
             }
         } catch (IOException e) {
-            throw new LoggingRuntimeException("Can't start server", e);
+            throw new CombinerRuntimeException("Can't start server", e);
         }
     }
 

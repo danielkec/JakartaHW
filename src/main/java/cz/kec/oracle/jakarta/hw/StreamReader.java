@@ -9,9 +9,9 @@ import java.net.URL;
 
 import cz.kec.oracle.jakarta.hw.domain.StreamEntry;
 import cz.kec.oracle.jakarta.hw.dto.EntryDto;
+import cz.kec.oracle.jakarta.hw.util.CombinerRuntimeException;
 import cz.kec.oracle.jakarta.hw.util.DtoMapper;
 import cz.kec.oracle.jakarta.hw.util.EntryMarshaller;
-import cz.kec.oracle.jakarta.hw.util.LoggingRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ public class StreamReader extends BufferedReader {
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
-            throw new LoggingRuntimeException(String.format("Malformed URL: %s", urlString), e);
+            throw new CombinerRuntimeException(String.format("Malformed URL: %s", urlString), e);
         }
 
         InputStream inputStream = null;
@@ -65,7 +65,7 @@ public class StreamReader extends BufferedReader {
         try {
             line = super.readLine();
         } catch (IOException e) {
-            throw new LoggingRuntimeException("Error when reading from input stream", e);
+            throw new CombinerRuntimeException("Error when reading from input stream", e);
         }
 
         if (line == null) {

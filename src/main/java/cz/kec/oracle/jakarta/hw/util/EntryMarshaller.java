@@ -36,7 +36,7 @@ public class EntryMarshaller {
             this.jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
         } catch (JAXBException e) {
-            throw new LoggingRuntimeException("Error when preparing marshallers", e);
+            throw new CombinerRuntimeException("Error when preparing marshallers", e);
         }
         this.jsonb = JsonbBuilder.create();
     }
@@ -46,7 +46,7 @@ public class EntryMarshaller {
             EntryDto.Data data = (EntryDto.Data) this.jaxbUnmarshaller.unmarshal(new StringReader(xmlString));
             return new EntryDto(data);
         } catch (JAXBException e) {
-            throw new LoggingRuntimeException("Error unmarshalling entry data", e);
+            throw new CombinerRuntimeException("Error unmarshalling entry data", e);
         }
     }
 
@@ -64,7 +64,7 @@ public class EntryMarshaller {
             jaxbMarshaller.marshal(entryDto.getData(), stringWriter);
             return stringWriter.toString();
         } catch (JAXBException e) {
-            throw new LoggingRuntimeException("Error marshalling entry data", e);
+            throw new CombinerRuntimeException("Error marshalling entry data", e);
         }
     }
 }

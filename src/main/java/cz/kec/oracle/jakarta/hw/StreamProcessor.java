@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ import cz.kec.oracle.jakarta.hw.domain.StreamEntry;
 import cz.kec.oracle.jakarta.hw.util.CombinerUrlStreamHandler;
 import cz.kec.oracle.jakarta.hw.util.DtoMapper;
 import cz.kec.oracle.jakarta.hw.util.EntryMarshaller;
-import cz.kec.oracle.jakarta.hw.util.LoggingRuntimeException;
+import cz.kec.oracle.jakarta.hw.util.CombinerRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +50,10 @@ public class StreamProcessor {
     }
 
     public void process() {
-        Map<String, StreamReader> readerMap = streamUrls.stream()
+        List<StreamReader> readerMap = streamUrls.stream()
                 .map(StreamReader::newInstance)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toMap(StreamReader::getUrl, r -> r));
+                .collect(Collectors.toList());
 
         if (readerMap.isEmpty()) {
             LOG.error("No streams to process, exiting.");
@@ -79,13 +79,13 @@ public class StreamProcessor {
         try {
             resultStream.write(line.getBytes(Charset.forName("UTF-8")));
         } catch (IOException e) {
-            throw new LoggingRuntimeException("Error when writing to output stream", e);
+            throw new CombinerRuntimeException("Error when writing to output stream", e);
         }
     }
 
-    private StreamEntry getOldestEntry(Map<String, StreamReader> readerMap) {
+    private StreamEntry getOldestEntry(List<StreamReader> readerMap) {
         StreamEntry oldestEntry = null;
-        for (StreamReader reader : readerMap.values()) {
+        for (StreamReader reader : readerMap) {
             final StreamEntry entry = reader.lazyRead();
             if (oldestEntry == null) {
                 oldestEntry = entry;
